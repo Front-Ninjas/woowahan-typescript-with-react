@@ -1,0 +1,150 @@
+# [우아한 타입스크립트 with 리액트] - [2-3장] 원시타입
+
+# **2.3 원시 타입(Primitive Types)**
+
+자바스크립트와 타입스크립트에서는 원시 타입(Primitive Type)과 원시 래퍼 객체(Primitive Wrapper Object)를 구분합니다. 
+
+## **boolean**
+
+`boolean` 타입은 논리적인 `true`와 `false` 값만을 가질 수 있습니다.
+
+```ts
+const isEmpty: boolean = true;
+const isLoading: boolean = false;
+
+// 특정 조건에 따라 boolean 값을 반환하는 함수
+function isTextError(errorCode: ErrorCodeType): boolean {
+  const errorAction = getErrorAction(errorCode);
+  return errorAction ? errorAction.type === ERROR_TEXT : false;
+}
+```
+
+### **Truthy & Falsy**
+자바스크립트에서는 `boolean` 값이 아니더라도 `Truthy` 또는 `Falsy`한 값으로 평가될 수 있습니다.
+
+```ts
+if ("hello") console.log("Truthy"); // 실행됨
+if (0) console.log("Falsy"); // 실행되지 않음
+```
+하지만, **이러한 값들은 boolean 원시 값이 아니므로 타입스크립트에서 `boolean` 타입으로 직접 사용할 수 없습니다.**
+
+## **undefined**
+
+`undefined`는 변수가 초기화되지 않았거나 존재하지 않음을 나타내는 값입니다.
+
+```ts
+let value: string;
+console.log(value); // undefined (값이 아직 할당되지 않음)
+
+// 옵셔널 프로퍼티와 undefined
+interface Person {
+  name: string;
+  job?: string; // 존재할 수도, 없을 수도 있음
+}
+```
+
+## **null**
+
+`null`은 의도적으로 값이 없음을 나타내는 원시 타입입니다.
+
+```ts
+let value: null | undefined;
+console.log(value); // undefined
+
+value = null;
+console.log(value); // null
+```
+
+```ts
+interface Person1 {
+  name: string;
+  job?: string; // job이 없을 수도 있음
+}
+
+interface Person2 {
+  name: string;
+  job: string | null; // job을 가질 수도, 비어있을 수도 있음
+}
+```
+
+## **number**
+
+`number` 타입은 정수 및 부동소수점 숫자를 포함합니다.
+
+```ts
+const maxLength: number = 10;
+const maxWidth: number = 120.3;
+const maximum: number = +Infinity;
+const notANumber: number = NaN;
+```
+
+## **bigint**
+
+`bigint`는 `ES2020`에서 도입된 데이터 타입으로, 타입스크립트 3.2부터 사용할 수 있습니다.
+
+```ts
+const bigNumber1: bigint = BigInt(999999999999);
+const bigNumber2: bigint = 999999999999n;
+```
+
+💡 **주의:** `bigint`와 `number`는 서로 다른 타입이므로 연산이 불가능합니다.
+```ts
+const num: number = 100;
+const bigNum: bigint = 100n;
+console.log(num + bigNum); // ❌ TypeError 발생
+```
+
+## **string**
+
+`string` 타입은 문자열을 나타내며, 템플릿 리터럴도 포함합니다.
+
+```ts
+const receiverName: string = "KG";
+const receiverPhoneNumber: string = "010-0000-0000";
+const letterContent: string = `안녕, 내 이름은 ${receiverName}이야.`;
+```
+
+
+## **symbol**
+
+`symbol`은 유일한 식별자를 만들기 위해 사용됩니다.
+
+```ts
+const MOVIE_TITLE = Symbol("title");
+const MUSIC_TITLE = Symbol("title");
+console.log(MOVIE_TITLE === MUSIC_TITLE); // false
+```
+
+### **unique symbol**
+타입스크립트에서는 `unique symbol`이라는 `symbol`의 하위 타입이 존재하며, `const`로 선언해야만 사용할 수 있습니다.
+
+```ts
+const UNIQUE_KEY: unique symbol = Symbol();
+let SYMBOL: unique symbol = Symbol(); // ❌ 오류 발생 (unique symbol은 const로 선언해야 함)
+```
+
+
+## **원시 타입과 래퍼 객체의 차이**
+
+자바스크립트에서는 원시 타입을 객체처럼 다룰 수 있도록 원시 래퍼 객체가 존재합니다.
+
+```ts
+const str: string = "hello";
+console.log(str.toUpperCase()); // "HELLO"
+```
+
+이러한 동작이 가능한 이유는, **원시 값이 일시적으로 원시 래퍼 객체로 변환되기 때문**입니다.
+```ts
+const str: string = "hello";
+const tempStr = new String(str); // 원시 래퍼 객체 생성
+console.log(tempStr); // String { "hello" }
+```
+
+타입스크립트에서는 원시 값과 원시 래퍼 객체를 엄격하게 구분해야 합니다.
+```ts
+const str1: string = "hello";
+const str2: String = new String("hello"); // ❌ 권장되지 않음
+```
+
+✅ **결론:** 타입스크립트에서는 원시 값을 사용하며, 원시 래퍼 객체는 직접 생성하지 않는 것이 일반적입니다.
+
